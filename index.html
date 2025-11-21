@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 Kuis Bojonegoro: The Baby Pink Masterpiece 🌸</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee+Outline&family=Chakra+Petch:wght@700&family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* ========================================================= */
+        /* COLOR PALETTE (DOMINASI BABY PINK & PUTIH) */
+        /* ========================================================= */
+        :root {
+            --color-primary: #F4C2C2; /* Baby Pink Pastel */
+            --color-secondary: #FF69B4; /* Hot Pink (Untuk Kontras & Streak) */
+            --color-dark: #333333; /* Dark Grey/Text Color */
+            --color-accent: #C71585; /* Medium Violet Red (Untuk Shadow & Border) */
+            --color-light: #FFFFFF; /* Putih */
+            --color-text-light: #ffffff;
+            --color-text-dark: #333333;
+            --color-correct: #4CAF50; /* Hijau */
+            --color-incorrect: #F44336; /* Merah */
+            --color-info-bg: rgba(255, 255, 255, 0.7); /* Background Transparan Info Bar */
+        }
+        
+        /* ========================================================= */
+        /* GLOBAL STYLES */
+        /* ========================================================= */
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* Gradient Baby Pink - Putih */
+            background: linear-gradient(135deg, var(--color-light) 0%, var(--color-primary) 100%); 
+            color: var(--color-text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Penting untuk bunga */
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* ========================================================= */
+        /* FALLING BLOSSOMS (BUNGA BERJATUHAN) */
+        /* ========================================================= */
+        .blossom-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1; 
+            overflow: hidden;
+        }
+
+        .blossom {
+            position: absolute;
+            color: var(--color-secondary); 
+            font-size: 1.5em;
+            animation: fall linear infinite;
+            opacity: 0.8;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-10vh) translateX(0) rotate(0deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(100vh) translateX(var(--fall-x)) rotate(var(--fall-rotate)); opacity: 0; }
+        }
+
+        /* ========================================================= */
+        /* OPENING SCREEN */
+        /* ========================================================= */
+        #opening-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-light));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        #opening-screen h1 {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 3em; /* Dikecilkan sedikit agar muat dengan judul panjang */
+            color: var(--color-secondary); /* Hot Pink */
+            text-shadow: 0 0 10px var(--color-primary), 0 0 20px var(--color-secondary);
+            animation: softGlow 2s infinite alternate;
+            margin-bottom: 5px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        @keyframes softGlow {
+            from { text-shadow: 0 0 5px var(--color-primary), 0 0 10px var(--color-secondary); }
+            to { text-shadow: 0 0 15px var(--color-primary), 0 0 30px var(--color-secondary); }
+        }
+        .subtitle {
+            font-size: 1.8em;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            color: var(--color-dark);
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        .visuals { 
+            display: flex; 
+            gap: 40px; 
+            margin-bottom: 50px; 
+        }
+        .thengul-figure, .ledre-snack, .pahlawan-icon { font-size: 4em; color: var(--color-secondary); text-shadow: 0 0 5px var(--color-primary); }
+        .thengul-figure { animation: dance 1s infinite alternate; }
+        .pahlawan-icon { animation: brave 0.8s infinite alternate; }
+        @keyframes dance { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+        @keyframes brave { from { transform: scale(1); } to { transform: scale(1.1); } }
+        .ledre-snack::before { content: '🍥'; animation: pulse 2s infinite; }
+
+        /* ========================================================= */
+        /* GAME UI & INFO BAR */
+        /* ========================================================= */
+
+        #info-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            color: var(--color-text-dark);
+            background-color: var(--color-info-bg);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            border: 2px solid var(--color-secondary);
+        }
+        #info-bar span {
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        #current-score { background-color: var(--color-primary); color: var(--color-dark); }
+        #current-streak { background-color: var(--color-secondary); color: var(--color-text-light); }
+
+
+        /* QUIZ BOX & TIMER */
+        .quiz-container {
+            background-color: var(--color-light);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            color: var(--color-text-dark);
+            min-height: 450px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            border: 5px solid var(--color-primary);
+        }
+        h2 {
+            color: var(--color-secondary);
+            border-bottom: 2px solid var(--color-primary);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        #timer-bar {
+            height: 15px;
+            background-color: var(--color-primary);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 10px var(--color-secondary);
+        }
+        #timer-progress {
+            width: 100%;
+            height: 100%;
+            background-color: var(--color-secondary);
+            transition: width 0.3s linear;
+        }
+
+
+        /* OPTION BUTTONS */
+        .option-button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid var(--color-secondary); /* Border Hot Pink */
+            background-color: var(--color-primary); /* Fill Baby Pink */
+            color: var(--color-text-dark);
+            text-align: left;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s, transform 0.1s;
+            font-size: 1em;
+            box-shadow: 0 4px var(--color-accent); /* Shadow Magenta */
+        }
+        .option-button:hover:not(:disabled) {
+            background-color: #FFC0CB; /* Lighter hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px var(--color-accent);
+        }
+        .option-button:disabled {
+            cursor: default;
+        }
+        
+        /* JAWABAN BENAR & SALAH */
+        .correct {
+            background-color: var(--color-correct) !important; 
+            color: white !important;
+            border-color: #388E3C !important;
+            box-shadow: 0 4px #388E3C !important;
+        }
+        .incorrect {
+            background-color: var(--color-incorrect) !important; 
+            color: white !important;
+            border-color: #D32F2F !important;
+            box-shadow: 0 4px #D32F2F !important;
+        }
+
+        /* APRESIASI */
+        #appreciation {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4em;
+            font-weight: bold;
+            color: var(--color-secondary);
+            text-shadow: 0 0 15px var(--color-primary), 0 0 25px var(--color-secondary);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 20;
+            font-family: 'Chakra Petch', sans-serif;
+        }
+        .show-appreciation {
+            animation: popUp 1s forwards;
+        }
+        @keyframes popUp {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* BUTTONS (NEXT, START, RESTART) */
+        .action-btn {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            background-color: var(--color-secondary);
+            color: var(--color-text-light);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 5px var(--color-accent);
+        }
+        .action-btn:hover {
+            background-color: #ff8cb4;
+            transform: translateY(-2px);
+            box-shadow: 0 7px var(--color-accent);
+        }
+
+        /* HINT & FOOTER */
+        .options-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+        #hint-button {
+            padding: 10px 15px;
+            font-size: 1em;
+            background-color: #ADD8E6; 
+            color: var(--color-text-dark);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px #5F9EA0;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+        #hint-button:hover:not(:disabled) { background-color: #87CEEB; }
+        #hint-button:disabled { background-color: #ccc; box-shadow: 0 4px #999; cursor: default; }
+
+        /* HEART BURST (Ganti Star Burst) */
+        .heart {
+            position: absolute;
+            color: var(--color-secondary);
+            font-size: 15px;
+            pointer-events: none;
+            z-index: 30;
+            text-shadow: 0 0 5px var(--color-primary);
+        }
+    </style>
+</head>
+<body>
+
+<div class="blossom-container"></div>
+
+<audio id="bgm" loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
+</audio>
+<audio id="sfx-correct">
+    <source src="https://commondatastorage.googleapis.com/codeskulptor-assets/jump.ogg" type="audio/ogg">
+</audio>
+<audio id="sfx-incorrect">
+    <source src="https://commondatastorage.googleapis.com/codeskulptor-assets/Evacuate!.ogg" type="audio/ogg">
+</audio>
+<audio id="sfx-goodjob">
+    <source src="https://commondatastorage.googleapis.com/codeskulptor-assets/week7-bounce.m4a" type="audio/m4a">
+</audio>
+<audio id="sfx-button-click">
+    <source src="https://commondatastorage.googleapis.com/codeskulptor-assets/Collision5-edited.wav" type="audio/wav">
+</audio>
+
+
+<div id="opening-screen">
+    
+    <h1>KELESTARIAN BOJONEGORO</h1>
+    <p class="subtitle">every step, every side of bojonegoro is wonderfull</p>
+    
+    <div class="visuals">
+        <div class="thengul-figure">🎭</div>
+        <div class="ledre-snack"></div>
+        <div class="pahlawan-icon">🛡</div>
+    </div>
+
+    <button class="action-btn" onclick="startGame(event)">Mulai Petualangan 🌸</button>
+</div>
+
+<div class="container" id="main-quiz-area" style="display:none;">
+    
+    <div id="info-bar">
+        <span id="current-score">Poin: 0</span>
+        <span id="current-streak">🔥 Streak: 0</span>
+    </div>
+
+    <div id="timer-bar"><div id="timer-progress"></div></div>
+
+    <div class="quiz-container">
+        <h2 id="current-topic"></h2>
+        <div id="appreciation"></div>
+        <div id="quiz-box">
+            </div>
+
+        <div class="options-footer">
+            <button id="hint-button" onclick="useHint()">💡 Bantuan (<span id="hint-count">2</span>)</button>
+            <div>
+                <button id="next-button" class="action-btn" style="display:none;">Soal Selanjutnya »</button>
+                <button id="restart-button" class="action-btn" onclick="restartQuiz(event)" style="display:none;">Ulangi Kuis 🔄</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // --- DATA SOAL 20 BUTIR ---
+    const questions = [
+        { question: "1. Bojonegoro berdiri secara administratif sejak masa kolonial Belanda sekitar tahun…", options: ["1800", "1907", "1945", "2001"], answer: "1907", topic: "Sejarah" },
+        { question: "2. Sungai yang menjadi sumber banjir dan kehidupan masyarakat Bojonegoro adalah…", options: ["Sungai Brantas", "Sungai Bengawan Solo", "Sungai Ciliwung", "Sungai Kapuas"], answer: "Sungai Bengawan Solo", topic: "Sejarah" },
+        { question: "3. Pada masa kerajaan, wilayah Bojonegoro termasuk pengaruh dari Kerajaan…", options: ["Sriwijaya", "Pajajaran", "Majapahit", "Mataram"], answer: "Majapahit", topic: "Sejarah" },
+        { question: "4. Dahulu Bojonegoro dikenal dengan julukan “Kota Api” karena…", options: ["Banyak gunung api", "Kebakaran hutan jati yang sering terjadi", "Cuaca sangat panas", "Terdapat industri pembakaran batu bata"], answer: "Kebakaran hutan jati yang sering terjadi", topic: "Sejarah" },
+        { question: "5. Sektor hasil hutan yang terkenal dari Bojonegoro sejak masa kolonial adalah…", options: ["Bambu", "Rotan", "Kayu jati", "Pinus"], answer: "Kayu jati", topic: "Sejarah" },
+        { question: "6. Wisata Negeri Atas Awan di Bojonegoro berada di kawasan…", options: ["Dander", "Kedungadem", "Bubulan/Sekar", "Gayam"], answer: "Bubulan/Sekar", topic: "Destinasi Wisata" },
+        { question: "7. Wana Tirta Dander terkenal dengan fasilitas…", options: ["Danau buatan", "Kolam renang dan area hutan", "Tempat pemancingan", "Goa alam"], answer: "Kolam renang dan area hutan", topic: "Destinasi Wisata" },
+        { question: "8. Tempat wisata yang berada di pusat kota dan menjadi ruang publik warga Bojonegoro adalah…", options: ["Alun-Alun Bojonegoro", "Taman Rajekwesi", "Kayangan Api", "Waduk Pacal"], answer: "Alun-Alun Bojonegoro", topic: "Destinasi Wisata" },
+        { question: "9. Kebun Belimbing Ngringinrejo merupakan wisata berbasis…", options: ["Peternakan sapi", "Agrowisata buah", "Perikanan air tawar", "Geowisata"], answer: "Agrowisata buah", topic: "Destinasi Wisata" },
+        { question: "10. Goa yang terkenal di wilayah Sekar dan memiliki stalaktit indah adalah…", options: ["Goa Gong", "Goa Banyu Nget", "Goa Lowo", "Goa Akbar"], answer: "Goa Banyu Nget", topic: "Destinasi Wisata" },
+        { question: "11. Ledre, oleh-oleh khas Bojonegoro, berbahan dasar…", options: ["Singkong", "Pisang", "Kacang hijau", "Ubi ungu"], answer: "Pisang", topic: "Makanan Khas" },
+        { question: "12. Keripik belut merupakan makanan khas Bojonegoro yang berasal dari…", options: ["Dander", "Ledok Kulon", "Kalitidu", "Sumberrejo"], answer: "Ledok Kulon", topic: "Makanan Khas" },
+        { question: "13. Soto khas Bojonegoro biasanya memiliki ciri…", options: ["Kuah hitam pekat", "Kuah santan ringan", "Kuah bening tanpa bumbu", "Kuah asam pedas"], answer: "Kuah santan ringan", topic: "Makanan Khas" },
+        { question: "14. Kudapan yang renyah dan sering dijadikan oleh-oleh khas Bojonegoro adalah…", options: ["Peyek kacang", "Ampyang", "Ledre", "Rempeyek udang"], answer: "Ledre", topic: "Makanan Khas" },
+        { question: "15. Masakan khas Bojonegoro yang menggunakan jagung muda adalah…", options: ["Rawon jagung", "Bothok jagung muda (putren)", "Sayur lodeh jagung", "Jagung bakar sambal bawang"], answer: "Bothok jagung muda (putren)", topic: "Makanan Khas" },
+        { question: "16. Blok Cepu dikenal sebagai wilayah penghasil…", options: ["Garam", "Migas", "Batu bara", "Emas"], answer: "Migas", topic: "Migas Blok Cepu" },
+        { question: "17. Lapangan minyak terbesar di Blok Cepu adalah…", options: ["Sukowati", "Banyuurip", "Kedungtuban", "Sukabumi"], answer: "Banyuurip", topic: "Migas Blok Cepu" },
+        { question: "18. Perusahaan asing yang bekerja sama dengan Pertamina dalam pengelolaan Blok Cepu adalah…", options: ["Chevron", "ExxonMobil", "Shell", "Total"], answer: "ExxonMobil", topic: "Migas Blok Cepu" },
+        { question: "19. Lapangan Banyuurip dikenal sebagai salah satu lapangan minyak dengan produksi terbesar di…", options: ["ASEAN", "Asia", "Jawa Timur", "Indonesia"], answer: "Indonesia", topic: "Migas Blok Cepu" },
+        { question: "20. Blok Cepu terutama berada di Kecamatan…", options: ["Dander", "Kalitidu", "Gayam", "Ngraho"], answer: "Gayam", "topic": "Migas Blok Cepu" }
+    ];
+
+    // --- VARIABEL GLOBAL & STATE ---
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timer;
+    const TIME_LIMIT = 30;
+    let timeLeft = TIME_LIMIT;
+    let isAnswered = false;
+    let currentStreak = 0;
+    let hintUses = 2; // Batas penggunaan bantuan
+
+    // --- DOM ELEMENTS & AUDIO ---
+    const mainQuizArea = document.getElementById('main-quiz-area');
+    const openingScreen = document.getElementById('opening-screen');
+    const quizBox = document.getElementById('quiz-box');
+    const nextButton = document.getElementById('next-button');
+    const restartButton = document.getElementById('restart-button');
+    const timerProgress = document.getElementById('timer-progress');
+    const appreciationDiv = document.getElementById('appreciation');
+    const topicTitle = document.getElementById('current-topic');
+    const scoreDisplay = document.getElementById('current-score');
+    const streakDisplay = document.getElementById('current-streak');
+    const hintButton = document.getElementById('hint-button');
+    const hintCountDisplay = document.getElementById('hint-count');
+    const blossomContainer = document.querySelector('.blossom-container'); // Tambahan
+
+    const bgm = document.getElementById('bgm');
+    const sfxCorrect = document.getElementById('sfx-correct');
+    const sfxIncorrect = document.getElementById('sfx-incorrect');
+    const sfxGoodJob = document.getElementById('sfx-goodjob');
+    const sfxButtonClick = document.getElementById('sfx-button-click'); // SFX Baru
+
+    // --- FUNGSI UTAMA GAME LOGIC ---
+    
+    // FUNGSI BLOSSOM
+    function createBlossom() {
+        const blossom = document.createElement('div');
+        blossom.classList.add('blossom');
+        // Menggunakan emoji bunga untuk tema baby pink
+        const emojis = ['🌸', '🌺', '💖', '🎀']; 
+        blossom.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+        // Random posisi, kecepatan, dan rotasi
+        const startX = Math.random() * 100;
+        const duration = Math.random() * 15 + 10; 
+        const fallX = (Math.random() - 0.5) * 500; 
+        const fallRotate = Math.random() * 1080 - 540; 
+        
+        blossom.style.left = `${startX}vw`;
+        blossom.style.animationDuration = `${duration}s`;
+        blossom.style.animationDelay = `-${Math.random() * duration}s`; 
+        blossom.style.setProperty('--fall-x', `${fallX}px`);
+        blossom.style.setProperty('--fall-rotate', `${fallRotate}deg`);
+
+        blossomContainer.appendChild(blossom);
+
+        setTimeout(() => {
+            blossom.remove();
+        }, duration * 1000);
+    }
+
+    function startBlossomEffect() {
+        setInterval(createBlossom, 500); // Tetesan bunga baru setiap 500ms
+    }
+
+    // FUNGSI BARU UNTUK MEMUTAR SFX TOMBOL
+    function playButtonClickSFX() {
+        sfxButtonClick.currentTime = 0;
+        sfxButtonClick.play();
+    }
+
+    // FUNGSI UTAMA LAINNYA
+    function updateInfoBar() {
+        scoreDisplay.textContent = `Poin: ${score}`;
+        streakDisplay.textContent = `🔥 Streak: ${currentStreak}`;
+        hintCountDisplay.textContent = hintUses;
+        
+        hintButton.disabled = isAnswered || hintUses <= 0;
+    }
+
+    // startGame dimodifikasi untuk memanggil SFX
+    function startGame(event) {
+        if (event) playButtonClickSFX(); // Panggil SFX saat tombol Start ditekan
+        openingScreen.style.display = 'none';
+        mainQuizArea.style.display = 'block';
+        playBGM(); 
+        startBlossomEffect(); // Mulai efek bunga
+        restartQuiz();
+    }
+
+    function playBGM() {
+        bgm.volume = 0.3; 
+        const playPromise = bgm.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.error("Gagal memainkan BGM: ", error);
+            });
+        }
+    }
+
+    function loadQuestion() {
+        if (currentQuestionIndex >= questions.length) {
+            showResult();
+            return;
+        }
+
+        const currentQ = questions[currentQuestionIndex];
+        isAnswered = false;
+        nextButton.style.display = 'none';
+        
+        topicTitle.textContent = `Soal ${currentQuestionIndex + 1} / ${questions.length} - Topik: ${currentQ.topic}`;
+
+        quizBox.innerHTML = `
+            <div class="question-box">
+                <p>${currentQ.question}</p>
+                <div id="options-container">
+                    ${currentQ.options.map((option) => `
+                        <button class="option-button" data-option="${option}" onclick="checkAnswer(this, event)">${option}</button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        
+        updateInfoBar();
+        resetTimer();
+        startTimer();
+    }
+
+    function startTimer() {
+        timeLeft = TIME_LIMIT;
+        timerProgress.style.width = '100%';
+        timerProgress.style.backgroundColor = 'var(--color-secondary)';
+
+        timer = setInterval(() => {
+            timeLeft--;
+            const percentage = (timeLeft / TIME_LIMIT) * 100;
+            timerProgress.style.width = percentage + '%';
+            
+            if (percentage < 30) {
+                 timerProgress.style.backgroundColor = 'var(--color-incorrect)'; 
+            }
+
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                timeUp();
+            }
+        }, 1000);
+    }
+
+    function resetTimer() {
+        clearInterval(timer);
+        timerProgress.style.width = '100%';
+        timerProgress.style.backgroundColor = 'var(--color-secondary)';
+    }
+
+    function timeUp() {
+        if (!isAnswered) {
+            isAnswered = true;
+            disableAllOptions();
+            handleIncorrectAnswer(null, true); // True untuk waktu habis
+            nextButton.style.display = 'block';
+        }
+    }
+
+    function showAppreciation(text) {
+        if (text !== "SALAH!" && text !== "WAKTU HABIS!") {
+            sfxGoodJob.currentTime = 0;
+            sfxGoodJob.play();
+        }
+
+        appreciationDiv.textContent = text;
+        appreciationDiv.classList.remove('show-appreciation');
+        void appreciationDiv.offsetWidth; 
+        appreciationDiv.classList.add('show-appreciation');
+    }
+
+    function disableAllOptions() {
+        document.querySelectorAll('.option-button').forEach(button => {
+            button.disabled = true;
+        });
+        hintButton.disabled = true;
+    }
+
+    function markCorrectAnswer() {
+        const correctAnswer = questions[currentQuestionIndex].answer;
+        document.querySelectorAll('.option-button').forEach(button => {
+            if (button.getAttribute('data-option') === correctAnswer) {
+                button.classList.add('correct');
+            }
+        });
+    }
+
+    function handleCorrectAnswer(selectedButton) {
+        score += 5;
+        currentStreak++;
+        selectedButton.classList.add('correct');
+        sfxCorrect.currentTime = 0; 
+        sfxCorrect.play();
+        
+        let appreciationText = "GOOD JOB!";
+        if (currentStreak > 1) {
+             appreciationText = `PERFECT! x${currentStreak}`;
+        }
+        
+        showAppreciation(appreciationText);
+        createHeartBurst(selectedButton);
+    }
+    
+    // Modifikasi fungsi ini: Peluang Kedua dihapus
+    function handleIncorrectAnswer(selectedButton, isTimeUp = false) {
+        markCorrectAnswer(); 
+        currentStreak = 0; 
+        
+        if (selectedButton) {
+            selectedButton.classList.add('incorrect');
+            sfxIncorrect.currentTime = 0;
+            sfxIncorrect.play();
+            showAppreciation("SALAH!");
+        } else if (isTimeUp) {
+            // Apresiasi untuk Waktu Habis
+            showAppreciation("WAKTU HABIS!");
+            sfxIncorrect.currentTime = 0;
+            sfxIncorrect.play();
+        }
+    }
+
+    // checkAnswer dimodifikasi untuk memanggil SFX
+    function checkAnswer(selectedButton, event) {
+        if (isAnswered) return;
+        
+        if (event) playButtonClickSFX(); // Panggil SFX saat tombol Opsi ditekan
+        
+        resetTimer();
+        isAnswered = true;
+        disableAllOptions();
+
+        const selectedAnswer = selectedButton.getAttribute('data-option');
+        const correctAnswer = questions[currentQuestionIndex].answer;
+
+        if (selectedAnswer === correctAnswer) {
+            handleCorrectAnswer(selectedButton);
+        } else {
+            handleIncorrectAnswer(selectedButton);
+        }
+
+        updateInfoBar();
+        nextButton.style.display = 'block';
+    }
+
+    function useHint() {
+        if (hintUses <= 0 || isAnswered) return;
+        
+        playButtonClickSFX(); // Panggil SFX saat tombol Bantuan ditekan
+
+        hintUses--;
+        const currentQ = questions[currentQuestionIndex];
+        const correctAnswer = currentQ.answer;
+        const optionButtons = document.querySelectorAll('.option-button:not(.disabled-by-hint)');
+        
+        let incorrectOptions = [];
+        optionButtons.forEach(button => {
+            if (button.getAttribute('data-option') !== correctAnswer && !button.disabled) {
+                incorrectOptions.push(button);
+            }
+        });
+
+        if (incorrectOptions.length > 1) {
+            const optionToEliminate = incorrectOptions[Math.floor(Math.random() * incorrectOptions.length)];
+            optionToEliminate.disabled = true;
+            optionToEliminate.style.backgroundColor = '#666'; 
+            optionToEliminate.style.color = 'white';
+            optionToEliminate.classList.add('disabled-by-hint');
+            optionToEliminate.textContent += ' (DIHILANGKAN)';
+            
+            showAppreciation("1 OPSI DIHILANGKAN");
+        }
+        
+        updateInfoBar();
+    }
+
+    // Ganti Star Burst menjadi Heart Burst
+    function createHeartBurst(targetElement) {
+        const rect = targetElement.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        for (let i = 0; i < 10; i++) {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.textContent = '💖'; 
+            heart.style.left = `${centerX}px`;
+            heart.style.top = `${centerY}px`;
+            
+            const angle = Math.random() * 360;
+            const distance = Math.random() * 80 + 50; 
+            
+            heart.style.setProperty('--distance-x', `${Math.cos(angle * Math.PI / 180) * distance}px`);
+            heart.style.setProperty('--distance-y', `${Math.sin(angle * Math.PI / 180) * distance}px`);
+
+            const heartAnimationName = `heartFall-${Date.now()}-${i}`;
+            heart.style.animationName = heartAnimationName;
+            
+            const styleSheet = document.styleSheets[0];
+            const keyframes = `@keyframes ${heartAnimationName} {
+                0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
+                100% { transform: translate(var(--distance-x), var(--distance-y)) scale(2); opacity: 0; }
+            }`;
+            styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
+
+            document.body.appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 1500);
+        }
+    }
+
+
+    // nextQuestion dimodifikasi untuk memanggil SFX
+    function nextQuestion(event) {
+        if (event) playButtonClickSFX(); // Panggil SFX saat tombol Next ditekan
+        currentQuestionIndex++;
+        loadQuestion();
+    }
+
+    function showResult() {
+        resetTimer();
+        quizBox.innerHTML = `
+            <div style="text-align: center; padding: 40px;">
+                <h2 style="color: var(--color-secondary);">🏆 KUIS SELESAI! 🏆</h2>
+                <p style="font-size: 1.5em; color: var(--color-accent);">Skor Akhir Anda:</p>
+                <p style="font-size: 3em; font-weight: bold; color: var(--color-secondary); text-shadow: 0 0 10px var(--color-primary);">${score} / ${questions.length * 5}</p>
+                <p style="font-size: 1.2em; color: var(--color-text-dark);">Anda telah menyelesaikan The Baby Pink Masterpiece!</p>
+            </div>
+        `;
+        nextButton.style.display = 'none';
+        restartButton.style.display = 'block';
+        topicTitle.textContent = 'Hasil Akhir';
+    }
+
+    // restartQuiz dimodifikasi untuk memanggil SFX
+    function restartQuiz(event) {
+        if (event) playButtonClickSFX(); // Panggil SFX saat tombol Restart ditekan
+        currentQuestionIndex = 0;
+        score = 0;
+        currentStreak = 0;
+        hintUses = 2;
+        restartButton.style.display = 'none';
+        loadQuestion();
+    }
+
+    // --- EVENT LISTENER ---
+    nextButton.addEventListener('click', nextQuestion);
+</script>
+
+</body>
+</html>
